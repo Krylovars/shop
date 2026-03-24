@@ -1,0 +1,41 @@
+@use "./_variables" as *;
+
+// Миксин для базового текста
+// $size — font-size
+// $weight — font-weight (по умолчанию 400)
+// $line — line-height (по умолчанию 1.4)
+// $color — цвет (по умолчанию currentColor)
+@mixin text($size, $weight: 400, $color: $color-text, $line: 1.4,) {
+  font-size: $size;
+  font-weight: $weight;
+  line-height: $line;
+  color: $color;
+}
+
+// Миксин для адаптивного текста
+// $text-md — font-size для средних разрешений
+// $text-sm — font-size для маленьких разрешений
+@mixin text-adaptive($text-md, $text-sm) {
+  @media (max-width: $breakpoint-lg) {
+    font-size: $text-md;
+  }
+  @media (max-width: $breakpoint-md) {
+    font-size: $text-sm;
+  }
+}
+
+// Сетка 3-2-1
+@mixin grid-3-2-1($gap: 24px) {
+  display: grid;
+  gap: $gap;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  @media (max-width: $breakpoint-lg) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: $breakpoint-md) {
+    grid-template-columns: 1fr;
+  }
+}
