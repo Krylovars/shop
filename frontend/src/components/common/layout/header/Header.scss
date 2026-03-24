@@ -1,0 +1,55 @@
+@use "../../../../styles/shared" as *;
+
+.header {
+  background: $color-bg-base;
+}
+
+.header__container {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 32px;
+  padding-bottom: 32px;
+}
+
+.header__left, .header__right {
+  display: flex;
+  align-items: center;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  margin-right: 64px;
+
+  & a {
+    @include text(20px, 400, 1.4);
+
+    &:hover {
+      color: $color-text-hover;
+    }
+  }
+}
+
+.cart {
+  &:hover {
+    color: $color-text-hover;
+  }
+}
+
+@media (max-width: $breakpoint-md) {
+  .header__container {
+    display: block;
+  }
+  .header__left {
+    display: block;
+    text-align: center;
+    padding-bottom: 16px;
+    border-bottom: 1px solid $color-border;
+  }
+  .header__right {
+    margin-top: 16px;
+    justify-content: space-between;
+    align-items: center;
+  }
+}

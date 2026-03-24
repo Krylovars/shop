@@ -1,0 +1,18 @@
+// Цвета
+$color-bg-base: #E1EDE6;
+$color-bg-hover: #376B44;
+$color-text: #2C2D35;
+$color-text-grey: #86928B;
+$color-text-white: #FFFFFF;
+$color-text-green: #598D66;
+$color-text-hover: #16a34a;
+$color-border: #C3D1C6;
+
+// Брейкпоинты (для медиа-запросов)
+$breakpoint-sm: 640px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+
+// Шрифты
+$font-sans-fallback: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+$font-mono-fallback: ui-monospace, monospace;
