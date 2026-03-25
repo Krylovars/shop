@@ -46,7 +46,7 @@
   transform: translateY(-7px) rotate(-45deg);
 }
 
-@media (max-width: $breakpoint-md) {
+@media (max-width: $breakpoint-sm) {
   .nav {
     display: none;
   }

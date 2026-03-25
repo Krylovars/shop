@@ -1,6 +1,7 @@
 import React from "react";
 import "./ProductsList.scss";
 import Link from "next/link";
+import Image from "next/image";
 
 type Product = {
     id: number;
@@ -13,6 +14,7 @@ type Product = {
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 const API_IMG_PRODUCT = process.env.URL_API_IMG_PRODUCT;
+
 async function GetProductsList() {
     const res = await fetch(`${API_BASE}/api/products`);
 
@@ -30,10 +32,10 @@ function buildProductImageUrl(
     img: string,
     baseUrl: string = API_IMG_PRODUCT ?? ""
 ): string {
-    return `${baseUrl}/${img}`;
+    return `${baseUrl}${img}`;
 }
 
-export  default async function ProductsList() {
+export default async function ProductsList() {
     const products = await GetProductsList();
 
     const productsArr = products.map((p: Product) => ({
@@ -49,9 +51,14 @@ export  default async function ProductsList() {
                 {productsArr.map((product: Product) => (
                     <div className="product-item" key={product.id}>
                         <Link href={`/product/${product.id}`}>
-                            <img className="product-item__image"
-                                 src={product.img}
-                                 alt={product.name}/>
+                            <Image
+                                className="product-item__image"
+                                src={product.img}
+                                alt={product.name}
+                                unoptimized
+                                width={300}
+                                height={400}
+                            />
                             <p className="product-item__author">{product.author}</p>
                             <p className="product-item__name">{product.name}</p>
                             <p className="product-item__description">{product.description}</p>

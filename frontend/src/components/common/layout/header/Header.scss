@@ -23,7 +23,7 @@
   margin-right: 64px;
 
   & a {
-    @include text(20px, 400, 1.4);
+    @include text(20px, 400);
 
     &:hover {
       color: $color-text-hover;
