@@ -12,7 +12,6 @@ export function Drawer({children, isOpen = false, onClose}: DrawerProps) {
     return (
         <>
             <div className="drawer">
-                <h2>Drawer</h2>
                 {children}
             </div>
             <div className="drawer-overlay" onClick={onClose}></div>

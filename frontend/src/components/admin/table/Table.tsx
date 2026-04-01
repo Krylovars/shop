@@ -2,6 +2,7 @@
 
 import './Table.scss';
 import {Drawer} from '@components/admin/drawer/Drawer';
+import {Form} from '@components/admin/form/Form';
 import {useState, useEffect} from 'react';
 
 type Product = {
@@ -16,7 +17,7 @@ type Product = {
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 const API_IMG_PRODUCT = process.env.URL_API_IMG_PRODUCT;
 
-async function GetProductsList() {
+async function getProductsList() {
     const res = await fetch(`${API_BASE}/api/products`);
 
     if (!res.ok) {
@@ -33,7 +34,7 @@ export default function Table() {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
     useEffect(() => {
-        GetProductsList().then(data => {
+        getProductsList().then(data => {
             setRows(data);
             if (data.length > 0) {
                 setHeaders(Object.keys(data[0]) as (keyof Product)[]);
@@ -73,8 +74,13 @@ export default function Table() {
                 </tbody>
             </table>
 
-            <Drawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)}>
-                <p>Drawer content</p>
+            <Drawer
+                isOpen={isDrawerOpen}
+                onClose={() => setIsDrawerOpen(false)}
+            >
+                <Form
+                    resource='products'
+                />
             </Drawer>
         </>
     );

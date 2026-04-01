@@ -1,6 +1,9 @@
 <?php
 
-use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/products', [ProductController::class, 'index']);
+foreach (config('api_resources') as $uri => $controller) {
+    Route::get("{$uri}/schema", [$controller, 'schema']);
+
+    Route::apiResource($uri, $controller);
+}
