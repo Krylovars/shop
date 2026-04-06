@@ -2,6 +2,7 @@ import React from "react";
 import "./ProductsList.scss";
 import Link from "next/link";
 import Image from "next/image";
+import {apiFetch} from "@lib/api"
 
 type Product = {
     id: number;
@@ -12,14 +13,10 @@ type Product = {
     img: string;
 };
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 const API_IMG_PRODUCT = process.env.URL_API_IMG_PRODUCT;
 
 async function GetProductsList() {
-    const res = await fetch(`${API_BASE}/api/products`);
-
-    const data = await res.json();
-
+    const data = await apiFetch<{ data: Product[] }>(`/api/products`);
     return data.data;
 }
 

@@ -1,10 +1,13 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import {apiFetch} from "@lib/api"
+import React, {useEffect, useState} from "react";
 
-const API = process.env.NEXT_PUBLIC_API_URL ?? "";
-
-type User = { id: number; name: string; email: string };
+type User = {
+    id: number;
+    name: string;
+    email: string
+};
 
 export default function TestHomePage() {
     const [mode, setMode] = useState<"login" | "register">("login");
@@ -19,18 +22,24 @@ export default function TestHomePage() {
     const tokenKey = "api_token";
 
     async function loadMe(token: string) {
-        const res = await fetch(`${API}/api/user`, {
-            headers: {
-                Accept: "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        if (!res.ok) {
+        try {
+            const response = (await apiFetch(`/api/user`, {
+                headers: {
+                    Accept: "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            })) as { id?: number; name?: string; email?: string };
+
+            if (!response.id) {
+                localStorage.removeItem(tokenKey);
+                setUser(null);
+                return;
+            }
+            setUser(response as User);
+        } catch {
             localStorage.removeItem(tokenKey);
             setUser(null);
-            return;
         }
-        setUser(await res.json());
     }
 
     useEffect(() => {
@@ -44,7 +53,7 @@ export default function TestHomePage() {
         setLoading(true);
         try {
             if (mode === "register") {
-                const res = await fetch(`${API}/api/register`, {
+                const res = await apiFetch(`/api/register`, {
                     method: "POST",
                     headers: {
                         Accept: "application/json",
@@ -57,21 +66,20 @@ export default function TestHomePage() {
                         password_confirmation: passwordConfirmation,
                     }),
                 });
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.message ?? "Ошибка регистрации");
+                const data = res as { token: string };
                 localStorage.setItem(tokenKey, data.token);
                 await loadMe(data.token);
             } else {
-                const res = await fetch(`${API}/api/login`, {
+                const res = await apiFetch(`/api/login`, {
                     method: "POST",
                     headers: {
                         Accept: "application/json",
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({ email, password }),
+                    body: JSON.stringify({email, password}),
                 });
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.message ?? "Ошибка входа");
+                const data = res as { token: string };
+                console.log(data);
                 localStorage.setItem(tokenKey, data.token);
                 await loadMe(data.token);
             }
@@ -85,13 +93,17 @@ export default function TestHomePage() {
     async function logout() {
         const t = localStorage.getItem(tokenKey);
         if (t) {
-            await fetch(`${API}/api/logout`, {
-                method: "POST",
-                headers: {
-                    Accept: "application/json",
-                    Authorization: `Bearer ${t}`,
-                },
-            });
+            try {
+                await apiFetch(`/api/logout`, {
+                    method: "POST",
+                    headers: {
+                        Accept: "application/json",
+                        Authorization: `Bearer ${t}`,
+                    },
+                });
+            } catch {
+                /* сеть / 401 — всё равно выходим локально */
+            }
         }
         localStorage.removeItem(tokenKey);
         setUser(null);
@@ -172,7 +184,7 @@ export default function TestHomePage() {
                                 </label>
                             </div>
                         )}
-                        {error && <p style={{ color: "red" }}>{error}</p>}
+                        {error && <p style={{color: "red"}}>{error}</p>}
                         <button type="submit" disabled={loading}>
                             {loading ? "…" : mode === "login" ? "Войти" : "Зарегистрироваться"}
                         </button>

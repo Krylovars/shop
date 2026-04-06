@@ -1,0 +1,26 @@
+# --- локальное (не в репозиторий) ---
+/shop/
+
+# --- ОС ---
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# --- редакторы / IDE ---
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# --- переменные окружения в корне (если появятся) ---
+.env
+.env.*
+!.env.example
+
+# --- логи в корне ---
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*

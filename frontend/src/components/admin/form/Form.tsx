@@ -1,9 +1,14 @@
-'use client';
-import {type ReactNode, useEffect, useState} from "react";
+"use client";
+
+import { type FormEvent, type ReactNode } from "react";
+import { apiFetch } from "@lib/api";
+import { useFetch } from "@lib/useFetch";
 
 type FormProps = {
     resource: string;
     children?: ReactNode;
+    /** Вызов после успешного сохранения (например обновить таблицу). */
+    onSuccess?: () => void;
 };
 
 type FieldMeta = {
@@ -12,51 +17,33 @@ type FieldMeta = {
     required?: boolean;
     options?: Record<string, string>;
 };
+
 type FormSchema = {
     fields: Record<string, FieldMeta>;
 };
 
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL;
-
-async function getData(resource: string) {
-    const res = await fetch(`${API_BASE}/api/${resource}/schema`);
-    return await res.json();
-}
 function renderControl(key: string, arrFields: FieldMeta) {
     const id = `form-field-${key}`;
-    let inputElement;
+    let inputElement: ReactNode = null;
     switch (arrFields.type) {
         case "string":
-            inputElement = (
-                <input
-                    id={id}
-                    name={key}
-                    type="text"
-                />
-            );
+            inputElement = <input id={id} name={key} type="text" />;
             break;
         case "number":
             inputElement = (
-                <input
-                    id={id}
-                    name={key}
-                    type="number"
-                    step="any"
-                />
+                <input id={id} name={key} type="number" step="any" />
             );
             break;
         case "select":
             inputElement = (
                 <select id={id} name={key}>
-                    <option key={0} value=''>
-                        Пусто
-                    </option>
-                    {arrFields.options && Object.entries(arrFields.options).map(([value, label]) => (
-                        <option key={value} value={value}>
-                            {label}
-                        </option>
-                    ))}
+                    <option value="">Пусто</option>
+                    {arrFields.options &&
+                        Object.entries(arrFields.options).map(([value, label]) => (
+                            <option key={value} value={value}>
+                                {label}
+                            </option>
+                        ))}
                 </select>
             );
             break;
@@ -70,6 +57,12 @@ function renderControl(key: string, arrFields: FieldMeta) {
                 />
             );
             break;
+        default:
+            inputElement = (
+                <span className="form-field__unknown">
+                    Неизвестный тип поля: {arrFields.type}
+                </span>
+            );
     }
 
     return (
@@ -80,32 +73,55 @@ function renderControl(key: string, arrFields: FieldMeta) {
     );
 }
 
-export function Form({resource, children}: FormProps) {
-    const [schema, setSchema] = useState<FormSchema | null>(null);
-    useEffect(() => {
-        getData(resource).then(setSchema).catch(console.error);
-    }, [resource]);
-    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+export function Form({ resource, children, onSuccess }: FormProps) {
+    const schemaUrl = resource ? `/api/${resource}/schema` : null;
+    const {
+        data: schema,
+        loading: schemaLoading,
+        error: schemaError,
+        refetch: refetchSchema,
+    } = useFetch<FormSchema>(schemaUrl);
+
+    async function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        const formData = new FormData(e.currentTarget);
-        await fetch(`${API_BASE}/api/${resource}`, {
-            method: "POST",
-            headers: { Accept: "application/json" },
-            body: formData,
-        });
+        const form = e.currentTarget;
+        const formData = new FormData(form);
+
+        try {
+            const data = (await apiFetch(`/api/${resource}`, {
+                method: "POST",
+                headers: { Accept: "application/json" },
+                body: formData,
+            })) as { success?: boolean };
+
+            if (data.success) {
+                form.reset();
+                onSuccess?.();
+            }
+        } catch {
+            /* ошибка уже в apiFetch */
+        }
     }
 
     return (
         <div className="admin-form">
-            {!schema && <p>Загрузка схемы…</p>}
-            {schema && (
-                <form onSubmit={handleSubmit}>
+            {schemaLoading && <p>Загрузка схемы…</p>}
+
+            {schemaError && (
+                <div>
+                    <p>{schemaError.message}</p>
+                    <button type="button" onClick={() => refetchSchema()}>
+                        Повторить
+                    </button>
+                </div>
+            )}
+
+            {schema && !schemaError && (
+                <form onSubmit={(e) => void handleSubmit(e)}>
                     {Object.entries(schema.fields).map(([key, field]) =>
                         renderControl(key, field)
                     )}
-                    <button type="submit">
-                        click
-                    </button>
+                    <button type="submit">Сохранить</button>
                 </form>
             )}
             {children}

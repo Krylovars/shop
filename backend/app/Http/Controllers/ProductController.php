@@ -47,7 +47,10 @@ class ProductController extends Controller
             $filename = $this->storeUploadedImage($request->file('img'));
             $product->update(['img' => $filename]);
         }
-        return new ProductResource($product->fresh()->load('country'));
+        return new ProductResource($product->fresh()->load('country'))
+            ->additional(['success' => true, 'message' => 'Товар создан'])
+            ->response()
+            ->setStatusCode(201);
     }
 
     private function storeUploadedImage(\Illuminate\Http\UploadedFile $file): string
@@ -90,7 +93,7 @@ class ProductController extends Controller
     {
         $schema = config('form')['products'];
         foreach ($schema['fields'] as $field => $config) {
-            if($config['type'] === 'select' ) {
+            if ($config['type'] === 'select') {
                 $schema['fields'][$field]['options'] = Country::all()->pluck('name', 'id');
             }
         }

@@ -27,7 +27,10 @@ class AuthController extends Controller
             'role_id' => 0,
         ]);
 
-        return response()->json($this->issueTokenResponse($user), 201);
+        $response = $this->issueTokenResponse($user);
+        $response['message'] = 'Пользователь успешно зарегистрирован';
+
+        return response()->json($response, 201);
     }
 
     public function login(Request $request)
@@ -45,7 +48,9 @@ class AuthController extends Controller
 
         $user = Auth::user();
 
-        return response()->json($this->issueTokenResponse($user));
+        $response = $this->issueTokenResponse($user);
+        $response['message'] = 'Успешный вход в систему';
+        return response()->json($response);
     }
 
     public function logout(Request $request)
@@ -71,6 +76,7 @@ class AuthController extends Controller
 
     public function me(Request $request)
     {
+
         return response()->json($request->user());
     }
 
