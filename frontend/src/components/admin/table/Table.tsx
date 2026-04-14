@@ -4,7 +4,7 @@ import "./Table.scss";
 import { Drawer } from "@components/admin/drawer/Drawer";
 import { Form } from "@components/admin/form/Form";
 import { useMemo, useState } from "react";
-import { useFetch } from "@lib/useFetch";
+import { useApiRequest } from "@lib/useApiRequest";
 
 type Product = {
     id: number;
@@ -14,19 +14,13 @@ type Product = {
     author: string;
     img: string;
 };
-
 type ProductsResponse = { data: Product[] };
 
 export default function Table() {
-    const { data, loading, error, refetch } =
-        useFetch<ProductsResponse>("/api/products");
-
+    const { data, loading, error } = useApiRequest<ProductsResponse>("/api/products", "GET");
     const rows = useMemo(() => data?.data ?? [], [data]);
     const headers = useMemo(
-        () =>
-            rows.length > 0
-                ? (Object.keys(rows[0]) as (keyof Product)[])
-                : [],
+        () => (rows.length > 0 ? Object.keys(rows[0]) as (keyof Product)[] : []),
         [rows]
     );
 
@@ -35,18 +29,13 @@ export default function Table() {
     if (loading) {
         return <p>Загрузка…</p>;
     }
-
     if (error) {
         return (
             <div>
                 <p>{error.message}</p>
-                <button type="button" onClick={() => refetch()}>
-                    Повторить
-                </button>
             </div>
         );
     }
-
     return (
         <>
             <div className="btn">
@@ -99,7 +88,7 @@ export default function Table() {
                 isOpen={isDrawerOpen}
                 onClose={() => setIsDrawerOpen(false)}
             >
-                <Form resource="products" onSuccess={() => refetch()} />
+                <Form resource="products" />
             </Drawer>
         </>
     );

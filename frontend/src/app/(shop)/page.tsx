@@ -7,5 +7,10 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-    return <ProductsList/>;
+
+    return (
+        <div className="container container__products-list">
+            <ProductsList/>
+        </div>
+    )
 }

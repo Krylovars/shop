@@ -1,6 +1,5 @@
 "use client";
-
-import {apiFetch} from "@lib/api"
+// todo
 import React, {useEffect, useState} from "react";
 
 type User = {
@@ -22,24 +21,24 @@ export default function TestHomePage() {
     const tokenKey = "api_token";
 
     async function loadMe(token: string) {
-        try {
-            const response = (await apiFetch(`/api/user`, {
-                headers: {
-                    Accept: "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-            })) as { id?: number; name?: string; email?: string };
-
-            if (!response.id) {
-                localStorage.removeItem(tokenKey);
-                setUser(null);
-                return;
-            }
-            setUser(response as User);
-        } catch {
-            localStorage.removeItem(tokenKey);
-            setUser(null);
-        }
+        // try {
+        //     const response = (await apiFetch(`/api/user`, {
+        //         headers: {
+        //             Accept: "application/json",
+        //             Authorization: `Bearer ${token}`,
+        //         },
+        //     })) as { id?: number; name?: string; email?: string };
+        //
+        //     if (!response.id) {
+        //         localStorage.removeItem(tokenKey);
+        //         setUser(null);
+        //         return;
+        //     }
+        //     setUser(response as User);
+        // } catch {
+        //     localStorage.removeItem(tokenKey);
+        //     setUser(null);
+        // }
     }
 
     useEffect(() => {
@@ -48,65 +47,65 @@ export default function TestHomePage() {
     }, []);
 
     async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
-        setError(null);
-        setLoading(true);
-        try {
-            if (mode === "register") {
-                const res = await apiFetch(`/api/register`, {
-                    method: "POST",
-                    headers: {
-                        Accept: "application/json",
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        name,
-                        email,
-                        password,
-                        password_confirmation: passwordConfirmation,
-                    }),
-                });
-                const data = res as { token: string };
-                localStorage.setItem(tokenKey, data.token);
-                await loadMe(data.token);
-            } else {
-                const res = await apiFetch(`/api/login`, {
-                    method: "POST",
-                    headers: {
-                        Accept: "application/json",
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({email, password}),
-                });
-                const data = res as { token: string };
-                console.log(data);
-                localStorage.setItem(tokenKey, data.token);
-                await loadMe(data.token);
-            }
-        } catch (err) {
-            setError(err instanceof Error ? err.message : "Ошибка");
-        } finally {
-            setLoading(false);
-        }
+        // e.preventDefault();
+        // setError(null);
+        // setLoading(true);
+        // try {
+        //     if (mode === "register") {
+        //         const res = await apiFetch(`/api/register`, {
+        //             method: "POST",
+        //             headers: {
+        //                 Accept: "application/json",
+        //                 "Content-Type": "application/json",
+        //             },
+        //             body: JSON.stringify({
+        //                 name,
+        //                 email,
+        //                 password,
+        //                 password_confirmation: passwordConfirmation,
+        //             }),
+        //         });
+        //         const data = res as { token: string };
+        //         localStorage.setItem(tokenKey, data.token);
+        //         await loadMe(data.token);
+        //     } else {
+        //         const res = await apiFetch(`/api/login`, {
+        //             method: "POST",
+        //             headers: {
+        //                 Accept: "application/json",
+        //                 "Content-Type": "application/json",
+        //             },
+        //             body: JSON.stringify({email, password}),
+        //         });
+        //         const data = res as { token: string };
+        //         console.log(data);
+        //         localStorage.setItem(tokenKey, data.token);
+        //         await loadMe(data.token);
+        //     }
+        // } catch (err) {
+        //     setError(err instanceof Error ? err.message : "Ошибка");
+        // } finally {
+        //     setLoading(false);
+        // }
     }
 
     async function logout() {
-        const t = localStorage.getItem(tokenKey);
-        if (t) {
-            try {
-                await apiFetch(`/api/logout`, {
-                    method: "POST",
-                    headers: {
-                        Accept: "application/json",
-                        Authorization: `Bearer ${t}`,
-                    },
-                });
-            } catch {
-                /* сеть / 401 — всё равно выходим локально */
-            }
-        }
-        localStorage.removeItem(tokenKey);
-        setUser(null);
+        // const t = localStorage.getItem(tokenKey);
+        // if (t) {
+        //     try {
+        //         await apiFetch(`/api/logout`, {
+        //             method: "POST",
+        //             headers: {
+        //                 Accept: "application/json",
+        //                 Authorization: `Bearer ${t}`,
+        //             },
+        //         });
+        //     } catch {
+        //         /* сеть / 401 — всё равно выходим локально */
+        //     }
+        // }
+        // localStorage.removeItem(tokenKey);
+        // setUser(null);
     }
 
     return (

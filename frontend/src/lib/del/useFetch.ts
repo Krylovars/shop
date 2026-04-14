@@ -1,13 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { apiFetch } from "@lib/api";
+import { useEffect, useRef, useState } from "react";
+import {fetchApi} from "@lib/del/fetchApi";
 
 export type UseFetchResult<T> = {
     data: T | undefined;
     loading: boolean;
     error: Error | null;
-    refetch: () => void;
 };
-
 export function useFetch<T>(
     url: string | null,
     requestInit?: RequestInit
@@ -15,15 +13,12 @@ export function useFetch<T>(
     const [data, setData] = useState<T | undefined>(undefined);
     const [loading, setLoading] = useState(() => Boolean(url));
     const [error, setError] = useState<Error | null>(null);
-    const [version, setVersion] = useState(0);
     const initRef = useRef(requestInit);
     initRef.current = requestInit;
 
-    const refetch = useCallback(() => {
-        setVersion((v) => v + 1);
-    }, []);
-
     useEffect(() => {
+        console.log('useEffect вызван с url:', url);
+
         if (!url) {
             setLoading(false);
             setData(undefined);
@@ -35,7 +30,7 @@ export function useFetch<T>(
         setLoading(true);
         setError(null);
 
-        apiFetch<T>(url, initRef.current ?? {})
+        fetchApi<T>(url, initRef.current ?? {})
             .then((res) => {
                 if (!cancelled) setData(res);
             })
@@ -50,8 +45,8 @@ export function useFetch<T>(
 
         return () => {
             cancelled = true;
+            console.log('Cleanup для url:', url);
         };
-    }, [url, version]);
-
-    return { data, loading, error, refetch };
+    }, [url]);
+    return { data, loading, error };
 }
