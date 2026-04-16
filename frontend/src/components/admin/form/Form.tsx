@@ -67,7 +67,8 @@ function renderControl(key: string, arrFields: FormField) {
 }
 
 export function Form(data: { resource: string }) {
-    const schemaUrl = `/api/${data.resource}/schema`;
+    const resource = data;
+    const schemaUrl = `/api/${resource}/schema`;
     const { data: schema, loading, error } = useApiRequest(
         () => httpClient<Schema>(schemaUrl)
     );
@@ -76,7 +77,7 @@ export function Form(data: { resource: string }) {
         e.preventDefault();
         const fd = new FormData(e.currentTarget);
 
-        const urlForm = `/api/${data.resource}`;
+        const urlForm = `/api/${resource}`;
         await httpClient (urlForm, {
             method: "POST",
             body: fd,
