@@ -3,7 +3,8 @@ import { useMemo } from "react";
 import "./ProductsList.scss";
 import Link from "next/link";
 import Image from "next/image";
-import { useApiRequest } from "@lib/useApiRequest";
+import { useApiRequest } from "@lib/http/useApiRequest";
+import {httpClient} from "@lib/http/httpClient";
 type Product = {
     id: number;
     name: string;
@@ -24,7 +25,10 @@ function buildProductImageUrl(
     return `${baseUrl}${img}`;
 }
 export default function ProductsList() {
-    const { data, loading, error } = useApiRequest<ProductsResponse>("/api/products", "GET");
+    const { data, loading, error } = useApiRequest(
+        () => httpClient<ProductsResponse>("/api/products")
+    );
+
     const productsArr = useMemo(
         () =>
             (data?.data ?? []).map((p: Product) => ({

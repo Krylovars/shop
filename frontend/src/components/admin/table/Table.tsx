@@ -3,8 +3,9 @@
 import "./Table.scss";
 import { Drawer } from "@components/admin/drawer/Drawer";
 import { Form } from "@components/admin/form/Form";
-import { useMemo, useState } from "react";
-import { useApiRequest } from "@lib/useApiRequest";
+import { useState } from "react";
+import { useApiRequest } from "@lib/http/useApiRequest";
+import { httpClient } from "@lib/http/httpClient";
 
 type Product = {
     id: number;
@@ -14,15 +15,20 @@ type Product = {
     author: string;
     img: string;
 };
+
 type ProductsResponse = { data: Product[] };
 
 export default function Table() {
-    const { data, loading, error } = useApiRequest<ProductsResponse>("/api/products", "GET");
-    const rows = useMemo(() => data?.data ?? [], [data]);
-    const headers = useMemo(
-        () => (rows.length > 0 ? Object.keys(rows[0]) as (keyof Product)[] : []),
-        [rows]
+    const { data, loading, error } = useApiRequest(
+        () => httpClient<ProductsResponse>('/api/products')
     );
+
+    const rows: Product[] = data?.data ?? [];
+    let headers: (keyof Product)[] = []
+
+    if (rows.length !== 0) {
+        headers = Object.keys(rows[0]) as (keyof Product)[]
+    }
 
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
@@ -88,6 +94,7 @@ export default function Table() {
                 isOpen={isDrawerOpen}
                 onClose={() => setIsDrawerOpen(false)}
             >
+
                 <Form resource="products" />
             </Drawer>
         </>

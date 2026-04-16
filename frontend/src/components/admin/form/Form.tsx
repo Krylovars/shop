@@ -1,7 +1,8 @@
 "use client";
 
 import { type FormEvent, type ReactNode } from "react";
-import { useApiRequest } from "@lib/useApiRequest";
+import { useApiRequest } from "@lib/http/useApiRequest";
+import {httpClient} from "@lib/http/httpClient";
 
 type FormField = {
     type: string;
@@ -67,17 +68,19 @@ function renderControl(key: string, arrFields: FormField) {
 
 export function Form(data: { resource: string }) {
     const schemaUrl = `/api/${data.resource}/schema`;
-    const { data: schema, loading, error } = useApiRequest<Schema>(schemaUrl, "GET");
+    const { data: schema, loading, error } = useApiRequest(
+        () => httpClient<Schema>(schemaUrl)
+    );
 
+    async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        const fd = new FormData(e.currentTarget);
 
-    function handleSubmit(e: FormEvent<HTMLFormElement>): Promise<void> {
-        // e.preventDefault();
-        // const form = e.currentTarget;
-        // const formData = new FormData(form);
-        //
-        // await submitResource({ body: formData });
-        // form.reset();
-
+        const urlForm = `/api/${data.resource}`;
+        await httpClient (urlForm, {
+            method: "POST",
+            body: fd,
+        });
     }
 
     if (loading) {
